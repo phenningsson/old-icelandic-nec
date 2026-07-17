@@ -54,7 +54,7 @@ Clustering is deterministic. UMAP (`random_state=42`) affects only the GUI layou
 
 | component | setting |
 |---|---|
-| String similarity | `0.50·JaroWinkler + 0.50·(1−normLevenshtein)` |
+| String similarity | `Jaro-Winkler + Levenshtein (weighted equally, 50/50)` |
 | Embedding distance | `1 − cosine` (L2-normalised) |
 | Hybrid distance | `default at 0.60·string + 0.40·embedding` (weight swept over `{0.0,…,1.0}`) |
 | HDBSCAN | `metric=precomputed`, `min_cluster_size=2`, `min_samples=1`, selection `eom`, `epsilon=0.0` |
