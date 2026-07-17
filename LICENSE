@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Pontus Henningsson and the OldBERTur project contributors
+Copyright (c) 2026 Pontus Henningsson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ SOFTWARE.
 NOTE ON DATA LICENSING (not covered by the MIT License above):
 
 The gold-standard CSV files (alexander_saga_persons.csv, alexander_saga_people.csv,
-alexander_saga_locations.csv) and the source edition (AM-519a-4to.xml) derive from the
+alexander_saga_locations.csv) and the diplomatic digital edition text derive from the
 Medieval Nordic Text Archive (Menota) diplomatic edition "AM 519 a 4to : Alexanders saga"
 by Andrea de Leeuw van Weenen, which is licensed under Creative Commons
 Attribution-ShareAlike 4.0 (CC-BY-SA 4.0). Reuse of these data files must preserve that
