@@ -103,7 +103,8 @@ examples/gui/                   example GUI cluster explorers (open in a browser
   diplomatic edition *AM 519 a 4to : Alexanders saga* by **Andrea de Leeuw van Weenen** (Medieval
   Nordic Text Archive, <https://clarino.uib.no/menota/text/menota/AM-519a-4to>), licensed **CC-BY-SA 4.0**. The full source edition is not redistributed here, see Menota. Any reuse of the included data (gold CSVs, diplomatic text) must preserve that attribution and share-alike.
 - **FastText corpus.** The subword model was trained on the diplomatic corpus released with the domain-adapted IceBERT MLM; the *exact trained model* is hosted on Hugging Face and downloaded automatically,
-  so the corpus is not needed to reproduce results. 
+  so the corpus is not needed to reproduce results. The model is available [`here`](https://huggingface.co/phenningsson/fasttext-old-icelandic-diplomatic).
+- **Domain-adapted IceBERT.** Is available [`here`](https://huggingface.co/phenningsson/icebert-old-icelandic-v11-diplomatic), and relates to [`this project`](https://huggingface.co/Riksarkivet/oldbertur-diplomatic-old-icelandic-ner).
 - **CluEval** (`clueval/CluEval`) is under its own MIT License; cite Kim & Kim (2023).
 
 ## Citation
