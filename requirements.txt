@@ -1,0 +1,15 @@
+# Runtime dependencies for clustering/clustering_v5.py
+numpy
+transformers
+torch          # for GPU (NVIDIA GB10 / aarch64): install the CUDA build, e.g.
+               #   pip install torch --index-url https://download.pytorch.org/whl/cu130
+hdbscan
+umap-learn
+python-Levenshtein
+
+# Evaluation harness (evaluation/) + CluEval (clueval/CluEval)
+scikit-learn   # V-measure / homogeneity / completeness
+pandas         # required by CluEval's metrics.py
+gensim           # FastText subword-embedding arm (evaluation/fasttext_embeddings.py)
+matplotlib       # weight-sweep figures (evaluation/plot_weight_sweep*.py)
+huggingface_hub  # fetch the IceBERT + exact FastText models from the Hugging Face Hub

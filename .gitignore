@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Trained FastText subword model (reproducible from corpus + fasttext_embeddings.py)
+evaluation/models/
+
+# Regenerable pipeline outputs (recreated by run_all_arms / weight_sweep / etc.)
+evaluation/out/
