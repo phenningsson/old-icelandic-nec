@@ -1,23 +1,20 @@
 # Old Icelandic Named Entity Clustering
 
-Unsupervised **Named Entity Clustering (NEC)** for diplomatic Old Icelandic: grouping the
-spelling and inflectional variants of one name into a single cluster (e.g. `alexanꝺer`,
-`alexanꝺro`, `alexanꝺrum` → *Alexander*). Code and data accompanying the paper, evaluated on
-an expert philologist's clustering of the diplomatic *Alexanders saga* (**AM 519 a 4to**).
+Automated **Named Entity Clustering (NEC)** for diplomatic Old Icelandic that groups the
+spelling and inflectional variants of one name into a single cluster (e.g., `alexanꝺer`,
+`alexanꝺro`, `alexanꝺrum` → *Alexander*). Code and data accompanying the paper **comming soon**, evaluated on a domain expert philologist's clustering of the diplomatic *Alexanders saga* (**AM 519 a 4to**).
 
-The task is *variant clustering* — grouping surface forms of the same name type. It is **not**
-entity linking (no external knowledge base), **not** coreference (referent is irrelevant), and
-**not** normalisation (we cluster the surface forms themselves).
+Please note that the task is *variant clustering*, i.e., grouping surface forms of the same name. It is **not** entity linking (no external knowledge base), **not** coreference (referent is irrelevant, it doesn't matter *which* Gunnar it is, just the name variations *of* Gunnar), and **not** normalisation (we cluster the surface forms themselves from the diplomatic digital edition).
 
 ## Proposed system
 
-A purely **lexical (string-only)** method — no embeddings, no training, no external resources:
+A purely **lexical (string-only)** method; no embeddings, no training, no external resources:
 
-- **Pairwise distance:** `1 − (0.50·Jaro–Winkler + 0.50·(1 − normalised Levenshtein) + 0.00·common-prefix)`, on the cased diplomatic forms.
+- **String distance:** Combined Levenshtein and Jaro-Winkler string similiarity measures (50/50 weighting).
 - **Clustering:** HDBSCAN (excess-of-mass, `min_cluster_size=2`, `min_samples=1`) on the precomputed distance matrix, then an intra-cluster distance cap (0.40); noise → singletons.
 - Run separately per entity type: **PER** (personal names), **PEO** (ethnonyms), **LOC** (locations).
 
-## Headline results (B³ F1, with singletons)
+## Main results (B³ F1, with singletons, see paper for more)
 
 | Type | forms → clusters | B³ F1 |
 |---|---|---|
@@ -25,18 +22,14 @@ A purely **lexical (string-only)** method — no embeddings, no training, no ext
 | PEO (ethnonyms) | 74 → 18 | **0.597** |
 | LOC (locations) | 128 → 76 | **0.938** |
 
-An ablation against neural embeddings — a domain-adapted IceBERT (contextual) and a
-domain-trained FastText subword model, alone and combined with the string distance — shows
-that **none surpasses the lexical signal** on names or places (a reported negative result).
+We also perform an ablation against neural embeddings, a domain-adapted IceBERT (contextual) and a
+domain-trained FastText subword model, alone and combined with the string distance. The results are mixed but show that the string measures drive performance, while embeddings can add small but noticeable gains in performance. 
 
 ## Reproduce
 
-Every reported number regenerates from a clean install. The **string-only system needs no
-model**; the neural arms use two models that are **public on Hugging Face and download
-automatically** (no login, no manual training):
+The **string-only system needs no model**; the neural arms use two models that are **public on Hugging Face and download automatically**:
 `phenningsson/icebert-old-icelandic-v11-diplomatic` and
-`phenningsson/fasttext-old-icelandic-diplomatic` (the exact FastText model behind the
-reported numbers).
+`phenningsson/fasttext-old-icelandic-diplomatic`.
 
 ```bash
 pip install -r requirements.txt          # on a CUDA GPU, install the matching torch build (see below)
@@ -55,30 +48,26 @@ headline (string-only, no model): `python -m evaluation.run_all_arms --arms stri
 `python-Levenshtein`, `gensim`, `matplotlib`, `torch`, `transformers`, `huggingface_hub`
 (see `requirements.txt`). Only the IceBERT arms need `torch`; on an NVIDIA GPU install the
 CUDA build, e.g. `pip install torch --index-url https://download.pytorch.org/whl/cu130`.
-Clustering is deterministic; the FastText model is fixed (hosted), so all reported numbers
-reproduce exactly. UMAP (`random_state=42`) affects only the GUI layout, not the scores.
+Clustering is deterministic. UMAP (`random_state=42`) affects only the GUI layout, not the scores.
 
 ## Configuration (hyperparameters)
 
 | component | setting |
 |---|---|
-| String similarity | `0.50·JaroWinkler + 0.50·(1−normLevenshtein) + 0.00·commonPrefix`, cased forms |
+| String similarity | `0.50·JaroWinkler + 0.50·(1−normLevenshtein)` |
 | Embedding distance | `1 − cosine` (L2-normalised) |
-| Hybrid distance | `0.60·string + 0.40·embedding` (weight swept over `{0.0,…,1.0}`) |
+| Hybrid distance | `default at 0.60·string + 0.40·embedding` (weight swept over `{0.0,…,1.0}`) |
 | HDBSCAN | `metric=precomputed`, `min_cluster_size=2`, `min_samples=1`, selection `eom`, `epsilon=0.0` |
-| Intra-cluster cap | 0.40 (peel the farthest member until all pairs ≤ 0.40) |
-| IceBERT (contextual) | 768-d MLM; ±100-char window, ≤128 sub-word tokens; mean-pool the span, average over occurrences |
-| FastText | gensim skip-gram, 100-d, char n-grams 2–5, window 5, 20 epochs, `min_count=1`, `seed=42` |
+| Intra-cluster cap | 0.40 (peel the farthest member until all pairs ≤ 0.40 to remove outliers/false positives) |
 
-These are design choices motivated a priori (not tuned on the gold). The canonical values live
-in `clustering/clustering_v5.py`.
+The hyperparameters can be set in `clustering/clustering_v5.py`.
 
 ## Interactive GUI
 
-An interactive cluster explorer — the human-in-the-loop curation interface in which a
-philologist inspects, merges, splits, and relabels clusters and exports a curated result.
-Pre-rendered examples (one per entity type) are in [`examples/gui/`](examples/gui/) — open them
-directly in a browser. To regenerate or serve:
+An interactive cluster explorer; human-in-the-loop curation interface in which a
+user can inspect, merge, split, and relabel clusters and export the result.
+Pre-rendered examples (one per entity type) are in [`examples/gui/`](examples/gui/). Open them
+directly in a browser (you may need to download them as files and then open the file in a browser). To regenerate:
 
 ```bash
 python -m evaluation.visualize_clusters --arm string
@@ -90,37 +79,33 @@ python -m evaluation.serve_gui
 ```
 clustering/clustering_v5.py     the clustering pipeline (distance + HDBSCAN + GUI generator)
 evaluation/                     evaluation harness
-  run_all_arms.py               canonical runner: cluster every arm + score
-  cluster_from_gold.py          cluster directly from the gold forms (all arms)
-  evaluate.py, metrics.py, clueval_metrics.py, align.py, gold.py, pipeline_io.py   scoring core
+  run_all_arms.py               cluster every arm + score
+  cluster_from_gold.py          cluster directly from the domain expert's gold forms (all arms)
+  evaluate.py, metrics.py, clueval_metrics.py, align.py, gold.py, pipeline_io.py   evaluation scoring 
   contextual_embeddings.py, fasttext_embeddings.py   neural ablation arms
   weight_sweep.py, plot_weight_sweep.py              weight-sensitivity table + figure
-  qualitative.py                error-analysis strata + per-cluster diffs
+  qualitative.py                error-analysis + per-cluster diffs
   validate.py                   reproducibility harness (exits non-zero on failure)
   visualize_clusters.py, serve_gui.py, tune.py, cluster_config.py   interactive GUI
-clueval/CluEval/                vendored metric tool (Kim & Kim 2023, MIT)
+clueval/CluEval/                metric tool (from Kim & Kim 2023, MIT license)
 alexander_saga_persons.csv      gold: PER (personal names)
 alexander_saga_people.csv       gold: PEO (ethnonyms / peoples)
 alexander_saga_locations.csv    gold: LOC (locations)
-alexander_saga_diplomatic.txt   raw diplomatic text (used by the contextual arm)
+alexander_saga_diplomatic.txt   raw diplomatic text (used by the contextual embedding arm)
 examples/gui/                   example GUI cluster explorers (open in a browser)
 ```
 
 ## Data & licensing
 
 - **Code** is released under the MIT License (see [`LICENSE`](LICENSE)).
-- **Gold standard and text.** The gold clustering (three entity types — PER / PEO / LOC —
-  matching the source edition's name typing) and the diplomatic text derive from the **Menota**
+- **Gold standard and text.** The gold clustering (three entity types, PER / PEO / LOC,
+  matching the source edition's entities) and the diplomatic text derive from the **Menota**
   diplomatic edition *AM 519 a 4to : Alexanders saga* by **Andrea de Leeuw van Weenen** (Medieval
-  Nordic Text Archive, <https://www.menota.org>), licensed **CC-BY-SA 4.0**. The full source
-  edition is not redistributed here — obtain it from Menota. Any reuse of the included data
-  (gold CSVs, diplomatic text) must preserve that attribution and share-alike.
-- **FastText corpus.** The subword model was trained on the diplomatic corpus released with the
-  IceBERT MLM; the *exact trained model* is hosted on Hugging Face and downloaded automatically,
-  so the corpus is not needed to reproduce results (retraining is optional).
-- **CluEval** (`clueval/CluEval`) is vendored under its own MIT License; cite Kim & Kim (2023).
+  Nordic Text Archive, <https://clarino.uib.no/menota/text/menota/AM-519a-4to>), licensed **CC-BY-SA 4.0**. The full source edition is not redistributed here, see Menota. Any reuse of the included data (gold CSVs, diplomatic text) must preserve that attribution and share-alike.
+- **FastText corpus.** The subword model was trained on the diplomatic corpus released with the domain-adapted IceBERT MLM; the *exact trained model* is hosted on Hugging Face and downloaded automatically,
+  so the corpus is not needed to reproduce results. 
+- **CluEval** (`clueval/CluEval`) is under its own MIT License; cite Kim & Kim (2023).
 
 ## Citation
 
-If you use this code or data, please cite the accompanying paper (details to follow) and the
-CluEval and Menota sources above.
+If you use this code or data, please cite the accompanying paper (**Coming soon**) and the sources above as relevant.
