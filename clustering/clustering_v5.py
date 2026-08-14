@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 """
-Entity Clustering v4 - Interactive Editor with Visualizations
-==============================================================
 
 Features:
 - Drag & drop cluster editor
 - 2D Scatter plot visualization (UMAP)
-- Network graph visualization
 - Source/work metadata tracking
 - Export curated clusters to JSON
 
@@ -42,7 +39,7 @@ REPO_DIR = SCRIPT_DIR.parent                          # .../west_norse_scripts
 DEFAULT_MODEL = os.environ.get("MODEL_PATH", "phenningsson/icebert-old-icelandic-v11-diplomatic")
 # Input for the standalone pipeline mode: a JSON of NER-tagged entity spans. The
 # evaluation harness does not use this; it clusters directly from the gold CSVs
-# (see evaluation/cluster_from_gold.py). Set ENTITIES_FILE to run this file directly.
+# (see evaluation/cluster_from_gold.py).
 DEFAULT_ENTITIES = os.environ.get("ENTITIES_FILE", str(REPO_DIR / "entities.json"))
 DEFAULT_OUTPUT = os.environ.get("OUTPUT_DIR", str(SCRIPT_DIR / "clustering_results_alexander"))
 
@@ -50,10 +47,7 @@ DEFAULT_OUTPUT = os.environ.get("OUTPUT_DIR", str(SCRIPT_DIR / "clustering_resul
 STRING_WEIGHT = 0.60
 EMBEDDING_WEIGHT = 0.40
 
-# String-similarity sub-weights. The prefix term is down-weighted to 0: the error
-# analysis showed prefix-sharing drove false merges of distinct names (e.g.
-# Arbela/Arabia/Araxes/Armenia), and Jaro-Winkler already rewards shared prefixes.
-# (Principled config motivated by the qualitative error analysis.)
+# String-similarity sub-weights.
 STRING_SIM_JW = 0.50
 STRING_SIM_LEV = 0.50
 STRING_SIM_PREFIX = 0.00
@@ -62,9 +56,6 @@ STRING_SIM_PREFIX = 0.00
 MIN_CLUSTER_SIZE = 2
 MIN_SAMPLES = 1
 CLUSTER_SELECTION_EPSILON = 0.0
-# "eom" (excess of mass) over "leaf": the error analysis showed leaf over-fragments
-# person clusters across many tiny clusters (high splitting error); eom yields
-# fewer, coherent clusters.
 CLUSTER_SELECTION_METHOD = "eom"
 
 # Hard cap on within-cluster distance: after HDBSCAN, any form farther than this
@@ -163,7 +154,7 @@ def combined_string_similarity(s1, s2):
     """Combined string similarity on the cased surface forms.
 
     No lowercasing and no character normalization: the clustering unit is the
-    cased surface-form type, to align with the cased gold standard. Do not reintroduce .lower().
+    cased surface-form type, to align with the cased gold standard. 
     """
     if s1 == s2:
         return 1.0
@@ -228,7 +219,7 @@ def deduplicate_entities(entities):
     
     for ent in entities:
         # Deduplicate on the cased surface form: the clustering unit is the cased
-        # surface-form type, to align with the cased gold standard. Do not lowercase here.
+        # surface-form type, to align with the cased gold standard. 
         key = ent["text"]
         context_obj = {
             "text": ent.get("context", ""),
@@ -804,8 +795,7 @@ def parse_args(argv=None):
         epilog="""\
 Examples:
   # Defaults: domain-adapted IceBERT v11-diplomatic MLM on the diplomatic
-  # Alexanders saga dataset (the evaluation setup). Requires authenticated HF
-  # access to the private model repo (HF_TOKEN / huggingface-cli login).
+  # Alexanders saga dataset (the evaluation setup).
   python clustering/clustering_v5.py
 
   # A different dataset / a local model checkpoint
@@ -819,14 +809,11 @@ Examples:
         "-m", "--model", default=DEFAULT_MODEL,
         help="Embedding model: a local path or a HuggingFace model id. Default is "
              "the domain-adapted diplomatic IceBERT MLM "
-             "'phenningsson/icebert-old-icelandic-v11-diplomatic' (private HF repo; "
-             "needs authenticated access). (default: %(default)s)",
     )
     parser.add_argument(
         "-e", "--entities", default=DEFAULT_ENTITIES,
         help="NER dataset JSON to cluster. May be an absolute/relative path or a "
              "filename resolved against the repo root "
-             "(e.g. alexander_diplomatic_flat_ner_dataset.json). (default: %(default)s)",
     )
     parser.add_argument(
         "-o", "--output", default=DEFAULT_OUTPUT,
