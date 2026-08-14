@@ -1,19 +1,10 @@
-"""Qualitative / philological tier.
-
-Necessary-but-not-sufficient: the metrics need a per-cluster error view for the
-philological analysis. For a chosen arm (default: the proposed hybrid), per entity
-type, this exports:
-
+"""
   1. Per-GOLD-cluster diff: each gold cluster, its forms, and which predicted
      clusters they landed in -> the splitting view (a gold cluster split across >1
      predicted cluster is fragmented).
   2. Per-PRED-cluster diff: each predicted cluster, its forms, and which gold
      clusters it mixes -> the LUMPING view (a predicted cluster spanning >1 gold
      cluster over-merges distinct entities).
-  3. A readable error-analysis report: the worst splits and lumps, with forms.
-  4. Strata: uncertainty ("Osäker...") and ethnonym ("folkslagsbeteckning") rows
-     from gold Notes, with metrics on the confident / name-only subsets so a
-     metric-"wrong" but philologically-defensible case can be set aside.
 
 HDBSCAN noise (-1) is resolved to per-form singletons (the scoring policy), and
 flagged as noise in the output.
