@@ -1,20 +1,13 @@
-"""Run the clustering pipeline on the GOLD forms (the canonical input).
+"""Run the clustering pipeline on the GOLD forms (the human input). Contextual embeddings (IceBERT) additionally read the raw diplomatic text.
 
-The clusterer only needs the cased surface-form TYPE strings (both the embedding and
-the string distance are computed from the form itself), so we feed it the gold forms
-directly. This guarantees the prediction item set equals the gold item set by
-construction. Contextual embeddings additionally read the raw diplomatic text.
-
-Reuses the pipeline's own distance + HDBSCAN core (clustering/clustering_v5.py) so
-the method is identical to the production pipeline; only the input source differs.
+Reuses the pipeline's own distance + HDBSCAN core (clustering/clustering_v5.py,
 
 Distance arms:
   - string    : string distance only            (no model needed; the proposed system)
   - embedding : cosine on IceBERT [CLS] only     (needs model)
-  - hybrid    : 0.60*string + 0.40*embedding     (needs model; ablation, not the proposed system)
+  - hybrid    : 0.60*string + 0.40*embedding     (needs model)
 
-Output: per entity type, a {form: predicted_label} JSON (HDBSCAN noise = -1),
-which evaluation/evaluate.py consumes directly.
+Output: per entity type, a {form: predicted_label} JSON (HDBSCAN noise = -1).
 """
 
 import argparse
@@ -29,11 +22,11 @@ from evaluation import gold as gold_mod
 _REPO = Path(__file__).resolve().parent.parent
 _PIPELINE_PATH = _REPO / "clustering" / "clustering_v5.py"
 # Three entity types, matching the source edition's name typing:
-#   PER = personal names; PEO = ethnonyms / peoples; LOC = locations.
+#   PER = personal names; PEO = ethnonyms; LOC = locations, i.e., place names.
 GOLD_FILES = {"PER": _REPO / "alexander_saga_persons.csv",
               "PEO": _REPO / "alexander_saga_people.csv",
               "LOC": _REPO / "alexander_saga_locations.csv"}
-# Canonical ordered entity types (single source of truth for the harness).
+# Canonical ordered entity types (single source of truth).
 ETYPES = ["PER", "PEO", "LOC"]
 
 
@@ -46,11 +39,11 @@ def _load_pipeline():
 
 def gold_entities(csv_path):
     """Build the pipeline's entity dicts straight from a gold CSV (one per cased
-    type), carrying frequency. Order is sorted for reproducibility."""
+    type), carrying frequency. Order is sorted."""
     rows = gold_mod.load_gold(csv_path)
     seen = {}
     for r in rows:
-        # gold is one row per cased type; keep first, accumulate freq defensively
+        # gold is one row per type
         if r.entity in seen:
             seen[r.entity]["frequency"] += r.frequency
         else:
@@ -77,7 +70,7 @@ def _embedding_distance_matrix(embeddings):
 
 
 def _contextual_embeddings(texts, raw_text, model_path, pipe):
-    """Mean-pooled contextual embeddings per form, with isolation fallback for any
+    """Mean-pooled contextual embeddings per form, with fallback for any
     form that could not be located in the raw text."""
     from evaluation.contextual_embeddings import contextual_form_embeddings
     vecmap = contextual_form_embeddings(texts, raw_text, model_path)
