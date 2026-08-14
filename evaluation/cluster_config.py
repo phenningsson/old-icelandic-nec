@@ -1,4 +1,4 @@
-"""Clustering hyperparameters — EDIT these, then run:
+"""Clustering hyperparameters, EDIT them below and then run for example:
 
     python -m evaluation.tune --arm hybrid --type LOC
 
@@ -7,14 +7,13 @@ evaluation/out/gui/tuned/ (refresh the browser tab served by evaluation.serve_gu
 
 The defaults reproduce the pipeline's current behaviour. Below each knob is the
 direction to move it if the clustering is "too liberal" (non-relevant forms swept
-into a cluster = over-merging / lumping) vs "too strict" (real variants left apart).
+into a cluster = over-merging / lumping) vs "too conservative" (real variants left apart, over-splitting).
 """
 
 # ---------------------------------------------------------------------------
 # 1. Distance combination  (only used by the 'hybrid' / 'contextual-hybrid' arms)
 # ---------------------------------------------------------------------------
 # dist = STRING_WEIGHT*string + EMBEDDING_WEIGHT*embedding   (should sum to 1.0)
-# The ablation shows string carries the signal; embedding weight barely matters.
 STRING_WEIGHT = 0.60
 EMBEDDING_WEIGHT = 0.40
 
@@ -22,9 +21,7 @@ EMBEDDING_WEIGHT = 0.40
 # 2. String-similarity sub-weights  (should sum to 1.0)
 # ---------------------------------------------------------------------------
 # similarity = JW*jaro_winkler + LEV*(1-norm_levenshtein) + PREFIX*common_prefix_ratio
-# Prefix is 0 in the principled default: it rewards shared starts and drove false
-# merges of distinct names (Arbela/Arabia/Araxes, Taxiles/Techilus); JW already
-# captures prefix affinity. Raise PREFIX (and lower LEV) only to recover recall.
+# Prefix is 0 in the default.
 STRING_JW = 0.50
 STRING_LEV = 0.50
 STRING_PREFIX = 0.00
@@ -37,18 +34,18 @@ STRING_PREFIX = 0.00
 MIN_CLUSTER_SIZE = 2
 
 # MIN_SAMPLES: how conservative. Higher = denser neighbourhood required to join a
-#   cluster, so borderline/non-relevant forms are pushed to NOISE instead of being
-#   swept in. **This is the main knob against "too liberal".** Try 2, 3, 5.
+#   cluster, so borderline/non-relevant forms are pushed to NOISE (-1 outliers) instead of being
+#   swept in.
 MIN_SAMPLES = 1
 
 # CLUSTER_SELECTION_EPSILON: clusters closer than this distance are MERGED. 0.0 = no
 #   extra merging. raising it makes clustering more liberal — keep at/near 0 to be
-#   stricter. (It cannot tighten below the data's own structure.)
+#   stricter.
 CLUSTER_SELECTION_EPSILON = 0.0
 
-# CLUSTER_SELECTION_METHOD: "eom" (excess of mass, the principled default) = fewer,
+# CLUSTER_SELECTION_METHOD: "eom" (excess of mass, the default) = fewer,
 #   coherent clusters (less splitting); "leaf" = many fine-grained clusters (more
-#   splitting). eom was adopted because leaf over-fragmented person clusters.
+#   splitting).
 CLUSTER_SELECTION_METHOD = "eom"
 
 # ---------------------------------------------------------------------------
