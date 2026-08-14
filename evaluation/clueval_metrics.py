@@ -1,14 +1,12 @@
-"""Thin adapter around the cloned CluEval tool (Kim & Kim 2023).
+"""Adapter around the cloned CluEval tool (Kim & Kim 2023), see clueval folder.
 
-We use CluEval -- the established tool -- for B³ and splitting/lumping, rather than
-an in-house reimplementation. CluEval's metric functions take clusters as
+We use CluEval for B³ and splitting/lumping, rather than building it ourselves in-house. CluEval's metric functions take clusters as
 *lists of lists of instance IDs* (not label vectors), so this module converts our
 aligned integer label vectors (from align.align_labels) into that format and calls
 CluEval directly.
 
 CluEval repo: clueval/CluEval (metrics.py: bcubed_precision_recall_fscore,
-split_lump_error_precision_recall_fscore). Its split/lump is the Kim (2019)
-max-overlap splitting/lumping error -- the real metric, not a B³-derived proxy.
+split_lump_error_precision_recall_fscore).
 """
 
 import importlib.util
@@ -63,8 +61,7 @@ def split_lump(gold_labels, pred_labels):
     """Splitting/lumping error via CluEval (Kim 2019).
 
     CluEval returns (precision, recall, f1) where precision = 1 − lumping error and
-    recall = 1 − splitting error. We expose both the precision/recall/f1 and the
-    error framing used in the paper's error analysis.
+    recall = 1 − splitting error.
     """
     true_c, pred_c = _to_cluster_lists(gold_labels, pred_labels)
     p, r, f = _clueval().split_lump_error_precision_recall_fscore(true_c, pred_c)
