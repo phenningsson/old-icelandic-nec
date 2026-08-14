@@ -1,13 +1,4 @@
 """Alignment + item-set check.
-
-Both metric backends must see the identical item set and consistent labels, or the
-scores describe different partitions and are silently wrong. This module:
-
-1. Computes the symmetric difference between the gold item set and the prediction
-   item set. If it is non-empty, the caller reports it and stops for human review
-   rather than imputing or dropping items.
-2. Once the item sets match, produces two aligned, integer-encoded label vectors
-   over a fixed, sorted list of the shared forms, which every metric consumes.
 """
 
 from dataclasses import dataclass, field
