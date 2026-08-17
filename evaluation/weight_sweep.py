@@ -1,15 +1,14 @@
 """Weight sensitivity sweep.
 
-Vary the string/embedding combination weight and score the core metrics, to show
-whether 0.60/0.40 is a sensible operating point or arbitrary. The distance is
+Vary the string/embedding combination weight and score the evaluation metrics. The distance is
     dist = w·string + (1−w)·embedding,   w ∈ {1.0, 0.8, 0.6, 0.4, 0.2, 0.0}
 run for both embedding kinds: isolation ([CLS] of the bare form) and contextual
 (mean-pooled in-context). Each distance matrix is computed once per entity type;
 only the cheap combine + HDBSCAN + scoring repeats per weight.
 
-w=1.0 is string-only (identical across kinds); w=0.0 is embedding-only.
+w=1.0 is string-only; w=0.0 is embedding-only.
 
-Outputs a tidy CSV (evaluation/out/weight_sweep.csv) and JSON for plotting.
+Outputs a CSV (evaluation/out/weight_sweep.csv) and JSON for plotting.
 """
 
 import argparse
