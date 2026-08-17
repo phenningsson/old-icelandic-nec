@@ -1,13 +1,4 @@
-"""Paper figure for the weight-sensitivity sweep (ablation).
-
-Shows B3 F1 (with singletons) as a function of the string weight w, where the
-combined distance is dist = w*string + (1-w)*embedding. w=1.0 is string-only
-(the proposed system); w=0.0 is embedding-only. One panel per entity type
-(PER, PEO, LOC), one line per reported embedding arm (IceBERT-contextual and
-FastText). The vertical marker at w=0.6 is the reported operating point; the
-faint dotted line is the all-singletons baseline. The point of the figure is to
-show that performance is flat across a broad range of w and only degrades toward
-the pure-embedding end -- so 0.6/0.4 is a robust, not a cherry-picked, choice.
+"""Code for generating the figure for the weight-sensitivity sweep (see ablation and the full paper).
 
 Reads evaluation/out/weight_sweep.csv (+ results_all_arms.json for baselines).
 Writes evaluation/out/weight_sweep.png / .pdf.
