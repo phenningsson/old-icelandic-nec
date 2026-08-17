@@ -1,12 +1,9 @@
-"""Serve the cluster-explorer GUIs over http://localhost:8000/ .
+"""Cluster-explorer GUIs over at http://localhost:8000/ (open in your browser).
 
 Run once (it keeps running); then just refresh the browser tab after re-rendering
 with `evaluation.tune` or `evaluation.visualize_clusters`:
-
     python -m evaluation.serve_gui            # http://localhost:8000/
 
-Serves evaluation/out/gui/ with no-cache headers (so a refresh always shows the
-latest render) and an auto index that links every *_cluster_explorer.html found.
 """
 
 import argparse
