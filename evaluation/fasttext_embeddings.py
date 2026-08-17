@@ -19,9 +19,7 @@ import numpy as np
 
 _REPO = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL_PATH = _REPO / "evaluation" / "models" / "fasttext_diplomatic.model"
-# The exact trained model used for the reported results (so the FastText arm
-# reproduces the paper numbers exactly, rather than depending on a fresh, non-
-# deterministic retrain). Downloaded on demand if the local model is absent.
+# The exact trained model used for the reported results. Downloaded on demand if the local model is absent. This code can be used to train the model yourself.
 HF_MODEL_REPO = "phenningsson/fasttext-old-icelandic-diplomatic"
 # gensim FastText.load needs the .model plus its ngram-vector sidecar.
 _HF_MODEL_FILES = ("fasttext_diplomatic.model",
@@ -75,7 +73,7 @@ def train_fasttext(corpus_path, out_path=DEFAULT_MODEL_PATH, vector_size=100,
 
 def _ensure_model(model_path):
     """Download the exact trained FastText model from Hugging Face if it is not
-    present locally (so results reproduce exactly). Returns the local .model path."""
+    present locally (so results reproduce). Returns the local .model path."""
     model_path = Path(model_path)
     if model_path.exists():
         return model_path
@@ -89,7 +87,7 @@ def _ensure_model(model_path):
 
 def form_vectors(forms, model_path=DEFAULT_MODEL_PATH):
     """Return an (N, dim) array of FastText vectors for `forms` (subword-derived, so
-    every form — including OOV/multiword — gets a vector). The exact trained model is
+    every form, including OOV/multiword, gets a vector). The exact trained model is
     fetched from Hugging Face on first use if not present locally."""
     from gensim.models import FastText
     model_path = _ensure_model(model_path)
