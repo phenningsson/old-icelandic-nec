@@ -1,4 +1,4 @@
-"""Contextual per-form embeddings (an ablation arm).
+"""Contextual per-form embeddings (one of the ablations arm).
 
 Instead of embedding each surface form in isolation (the bare form's [CLS] vector),
 this embeds each occurrence of a form in its sentence-window context and mean-pools
@@ -11,9 +11,9 @@ per form:
       average the per-occurrence vectors into one contextual vector for F
 
 Forms are located by search over the raw text; a form with no locatable occurrence
-returns None (the caller falls back to the isolation embedding). Contextual vectors
-encode usage and referent rather than surface form, so this arm is not expected to
-help when grouping spelling variants of a name -- which is what the ablation tests.
+returns None (i.e., falls back to the isolation embedding). Contextual vectors
+encode usage and referent rather than surface form, which is what the ablation tests 
+  how this affects clusering performance.
 """
 
 import re
@@ -42,7 +42,7 @@ def contextual_form_embeddings(forms, raw_text, model_path,
     model = AutoModel.from_pretrained(model_path).to(device)
     model.eval()
 
-    # gather all occurrence windows, tagged by form, in one flat list to batch
+    # gather all occurrence windows, tagged by form, in one flat list
     jobs = []  # (form, window_text, span_start_in_window, span_end_in_window)
     n_text = len(raw_text)
     for f in forms:
