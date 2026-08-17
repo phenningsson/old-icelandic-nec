@@ -1,12 +1,12 @@
-"""Validation harness — verifies the evaluation is sound and reproducible.
+"""Validation; verifies the evaluation is sound and reproducible.
 
 Run after (re)generating predictions/results. Exits non-zero if any check fails,
 so it can gate a commit / CI. Checks:
 
-  1. Item-set match: gold and prediction cover the identical cased-form set for every arm.
+  1. Item-set match: gold and prediction cover the identical form set for every arm.
   2. Metric agreement: the in-house B³ matches CluEval's B³ to < 1e-9 (the two
      independent implementations corroborate each other).
-  3. Encoding round-trip: a known medieval form (`alexanꝺer`) loads and scores
+  3. Encoding: a known medieval form (`alexanꝺer`) loads and scores
      with its bytes intact.
   4. Baseline sanity: all-singletons → B³ precision 1.0; all-in-one → B³ recall 1.0.
   5. Gold reproduces: 174 PER / 18 PEO / 76 LOC scoring clusters from the CSVs.
@@ -61,7 +61,7 @@ def run():
         diff = max(abs(ih[k] - ce[k]) for k in ih)
         ok &= _check(f"{et} B³ agreement", diff < 1e-9, f"max|Δ|={diff:.1e}")
 
-    print("3. Encoding round-trip:")
+    print("3. Encoding check:")
     rows = gm.load_gold(GOLD["PER"])
     hit = [r for r in rows if r.entity == "alexanꝺer"]
     ok &= _check("'alexanꝺer' intact", len(hit) == 1,
