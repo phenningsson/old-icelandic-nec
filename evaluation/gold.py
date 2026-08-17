@@ -2,23 +2,23 @@
 
 Schema (all files): entity, frequency, cluster_id, subcluster_id, Notes
 
-The clustering unit is the cased surface-form `entity` (no lowercasing). Each row
-maps one cased form to one gold cluster.
+The clustering unit is the surface-form `entity` (no lowercasing). Each row
+maps one form to one gold cluster.
 
 Cluster key
 -----------
-The cluster key is the normalized full `cluster_id` string (e.g. "1 Alexander"):
+The cluster key is the normalised full `cluster_id` string (e.g. "1 Alexander"):
 each distinct label the annotator wrote is one cluster. Whitespace is normalized
-(strip + collapse internal runs). A trailing `/`-suffix marks the annotator's
+(strip + collapse internal runs) for uniformity. A trailing `/`-suffix marks the annotator's
 sub-variant naming convention for one cluster (e.g. "7 Saracen" / "7 Saracen/serkr"),
-so it is collapsed to the base label before the first `/`. The normalized strings
-are then factorized to contiguous integer ids at scoring time (align._encode).
-The leading integer alone is not a safe key: some integers are reused across
+so it is collapsed to the base label before the first `/`. The normalised strings
+are then factorised to contiguous integer ids at scoring time (align._encode).
+The leading integer alone is not a safe key: some integers are mistakenly reused across
 different names, e.g. "17 Cebalinus" vs "17 Zoroas".
 
 Special rows:
 - Blank `cluster_id` (`maceꝺo`) -> its own synthetic singleton cluster.
-- Empty `entity` -> skipped defensively.
+- Empty `entity` -> skipped.
 """
 
 import csv
@@ -95,8 +95,8 @@ def load_gold(csv_path, cluster_key: str = "full"):
 
 
 def gold_label_map(rows):
-    """Build {entity: cluster_label}. Raises if a cased entity appears twice
-    (the gold is expected to have one row per cased type)."""
+    """Build {entity: cluster_label}. Raises if a entity appears twice
+    (the gold is expected to have one row per type)."""
     out = {}
     for r in rows:
         if r.entity in out and out[r.entity] != r.cluster_label:
@@ -141,10 +141,9 @@ def cluster_id_anomalies(rows):
     """Surface cluster_id quirks that affect (or could affect) the cluster key.
 
     Reports, without auto-resolving, the leading integers mapping to >1 distinct
-    normalized label (why leading-int is unsafe), split into:
-      * `slash_variants`: same base name, slash-suffixed sub-labels (the annotator
-        subdivided one number) -- a merge judgment call for the philologist.
-      * `distinct_names`: genuinely different names sharing a number -- correctly
+    normalised label (why leading-int is unsafe), split into:
+      * `slash_variants`: same base name, slash-suffixed sub-labels 
+      * `distinct_names`: genuinely different names sharing a number,
         kept separate by the full-string key.
     """
     by_int = defaultdict(set)
