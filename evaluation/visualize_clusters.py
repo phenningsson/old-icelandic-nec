@@ -1,12 +1,12 @@
 """Render a clustering arm in the interactive GUI from clustering/clustering_v5.py.
 
-Takes the clusters we produced (gold forms clustered under a chosen distance arm)
-and builds the drag-and-drop cluster editor + 2D scatter ("map") HTML, so the
-philologist can inspect, merge/split, relabel, and see the clusters laid out.
+Takes the clusters produced (gold forms clustered under a chosen distance arm)
+and builds the drag-and-drop cluster editor + 2D scatter ("map") HTML, so a
+user can inspect, merge/split, relabel, and see the clusters laid out.
 
 - Clusters come from the arm's prediction file (evaluation/out/predictions/), so the
-  view matches exactly what was scored. HDBSCAN noise (-1) shows in the Noise panel.
-- Each form is enriched with its real occurrences in the saga text (context modal +
+  view matches exactly what was scored. HDBSCAN noise (-1) shows in the Noise (unclustured outliers) panel.
+- Each form is enriched with its real occurrences in the saga text (context +
   highlight) and its frequency.
 - The scatter layout is UMAP on the arm's own precomputed distance matrix, so the map
   reflects the distance that actually produced the clustering (string / embedding /
@@ -39,7 +39,7 @@ WORK_NAME = "Alexanders saga"
 
 
 def _enrich_with_contexts(entities, raw_text, max_ctx=20, window=40):
-    """Attach real text occurrences (for the GUI context modal) and variants/works."""
+    """Attach real text occurrences (for the GUI context) and variants/works."""
     n = len(raw_text)
     for e in entities:
         ctxs = []
