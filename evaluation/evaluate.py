@@ -1,14 +1,15 @@
 """Scoring orchestration.
 
-Routes a single pair of aligned label vectors through the full policy:
-- noise (-1) -> singleton (primary), plus a noise-excluded variant
+Routes a single pair of aligned label vectors through the full scoring policy:
+- noise (-1) -> singleton (primary), plus a noise-excluded variant (without singletons)
 - with-singletons and without-singletons (gold size >= 2) reporting
 - all core + supplementary metrics
-- the two degenerate baselines (all-singletons, all-in-one)
-- optional, flag-gated bootstrap CIs (off by default)
+- the two baselines (all-singletons, all-in-one)
 
 Alignment always runs an item-set check first and refuses to score a mismatched
-pair; callers must resolve the symmetric difference upstream.
+pair; callers must resolve the symmetric difference first. 
+Includes V-measure which is not used in the paper due to length and scope constraints 
+(v-measure was initially used, but later on removed since it shares many of the same evaluation features as B3).
 """
 
 import argparse
@@ -61,7 +62,7 @@ def score_pair(gold_map, pred_map, with_bootstrap=False):
 
 
 def score_baselines(gold_map):
-    """All-singletons and all-in-one baselines on the gold item set."""
+    """All-singletons and all-in-one baselines on the gold item test set."""
     forms = sorted(gold_map)
     return {
         "all_singletons": score_pair(gold_map, M.baseline_all_singletons(forms)),
