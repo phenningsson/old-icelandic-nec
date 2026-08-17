@@ -1,17 +1,16 @@
-"""Canonical end-to-end runner: cluster every arm from the gold forms and score,
+"""Cluster every arm from the gold forms and score,
 writing evaluation/out/results_all_arms.json (the results for every arm and type).
 
-For each entity type (PER = personal names, PEO = ethnonyms, LOC = locations) and each
+For each entity type (PER = personal names, PEO = ethnonyms, LOC = place names) and each
 distance arm, this clusters directly from the gold surface forms
-(evaluation.cluster_from_gold) — so the predicted and gold item sets match by
-construction — and scores under the full policy (evaluation.evaluate.score_pair):
+(evaluation.cluster_from_gold). The predicted and gold item sets match by
+construction, and scores under the full policy (evaluation.evaluate.score_pair):
 noise→singleton, with/without singletons, baselines.
 
 Per-type, per-arm predictions are cached to evaluation/out/predictions/{et}_pred_{arm}.json
-(the inputs to qualitative / validate).
 
 Run:  python -m evaluation.run_all_arms            # all arms, all types
-      python -m evaluation.run_all_arms --arms string   # subset
+      python -m evaluation.run_all_arms --arms string   # subset, e.g., only runs the string
 """
 
 import argparse
