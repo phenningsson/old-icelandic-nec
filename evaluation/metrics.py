@@ -1,18 +1,14 @@
 """Scoring metrics and policy.
 
-Lean, deliberate metric set -- do not expand the headline:
-
-- V-measure (+ homogeneity, completeness)   [sklearn]   -- primary
+- V-measure (+ homogeneity, completeness)   [sklearn]   -- primary (not reported or used in the paper, legacy metric, can safely ignore)
 - B-cubed (B3) precision / recall / F1       [CluEval]   -- primary
 - Splitting / Lumping error                  [CluEval]   -- supplementary
 
 All metrics consume the aligned integer label vectors from align.align_labels.
 
 B3 and split/lump come from the established CluEval tool (Kim & Kim 2023) via
-`evaluation/clueval_metrics.py` -- the headline `all_core_metrics` routes through
-it. The in-house `b_cubed` below is retained only as a sklearn/CluEval-independent
-cross-check (validated to match CluEval on this data). CluEval's split/lump is the
-real Kim (2019) max-overlap error, not a B3-derived proxy.
+`evaluation/clueval_metrics.py`. The in-house `b_cubed` below only acts as a sklearn/CluEval-independent
+cross-check (validated to match CluEval on this data). CluEval's split/lump is the Kim (2019) max-overlap error.
 """
 
 import numpy as np
@@ -21,10 +17,7 @@ from sklearn.metrics import homogeneity_completeness_v_measure
 from evaluation import clueval_metrics
 
 
-# --------------------------------------------------------------------------
 # Core metrics
-# --------------------------------------------------------------------------
-
 def v_measure(gold_labels, pred_labels):
     """Homogeneity / completeness / V-measure via sklearn."""
     h, c, v = homogeneity_completeness_v_measure(gold_labels, pred_labels)
@@ -91,10 +84,7 @@ def _group_indices(labels):
     return groups
 
 
-# --------------------------------------------------------------------------
-# Label transforms (policy)
-# --------------------------------------------------------------------------
-
+# Label transforms
 def noise_to_singletons(forms, pred_map, noise_label=-1):
     """Convert each HDBSCAN noise item (-1) into its own unique singleton.
 
@@ -113,7 +103,7 @@ def count_noise(pred_map, noise_label=-1):
 
 
 def restrict_to_nonsingleton_gold(forms, gold_labels, pred_labels):
-    """Keep only items whose GOLD cluster has size >= 2 (Cattan et al. 2021).
+    """Keep only items whose GOLD cluster has size >= 2 (Cattan et al. 2020).
 
     Returns (forms', gold_labels', pred_labels') as filtered parallel lists.
     """
