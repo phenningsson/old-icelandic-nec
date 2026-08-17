@@ -1,4 +1,4 @@
-"""Prediction-side I/O: load predicted cluster labels.
+"""Helper-function for the prediction-side I/O: load predicted cluster labels.
 
 Scoring needs predicted cluster labels per cased surface-form type. The clusterer
 writes a {entity: label} JSON (see evaluation/cluster_from_gold.py); `-1` (HDBSCAN
